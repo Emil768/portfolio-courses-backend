@@ -1,0 +1,139 @@
+import TestModel from "../models/Test.js";
+
+export const getAll = async (req, res) => {
+  try {
+    const tests = await TestModel.find().populate("user").exec();
+    res.json(tests);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Не удалось создать тест",
+    });
+  }
+};
+
+export const getOne = async (req, res) => {
+  try {
+    const testId = req.params.id;
+
+    TestModel.findOneAndUpdate(
+      {
+        _id: testId,
+      },
+      {
+        $inc: {
+          viewsCount: 1,
+        },
+      },
+      {
+        returnDocument: "after",
+      },
+      (err, doc) => {
+        if (err) {
+          return res.status(500).json({
+            message: "Не удалось вернуть статью",
+          });
+        }
+
+        if (!doc) {
+          return res.status(404).json({
+            message: "Статья не найдена",
+          });
+        }
+
+        res.json(doc);
+      }
+    );
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Не удалось создать тест",
+    });
+  }
+};
+
+export const create = async (req, res) => {
+  try {
+    const doc = new TestModel({
+      title: req.body.title,
+      text: req.body.text,
+      category: req.body.category,
+      backgroundImage: req.body.backgroundImage,
+      ques: req.body.ques,
+      user: req.userId,
+    });
+
+    const test = await doc.save();
+
+    res.json(test);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Не удалось создать тест",
+    });
+  }
+};
+
+export const update = async (req, res) => {
+  try {
+    const testId = req.params.id;
+
+    await TestModel.findOneAndUpdate(
+      {
+        _id: testId,
+      },
+      {
+        title: req.body.title,
+        text: req.body.text,
+        category: req.body.category,
+        backgroundImage: req.body.backgroundImage,
+        ques: req.body.ques,
+        user: req.userId,
+      }
+    );
+
+    res.json({
+      success: true,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Не удалось обновить тест",
+    });
+  }
+};
+
+export const remove = async (req, res) => {
+  try {
+    const testId = req.params.id;
+
+    TestModel.findOneAndDelete(
+      {
+        _id: testId,
+      },
+
+      (err, doc) => {
+        if (err) {
+          return res.status(500).json({
+            message: "Не удалось удалить статью",
+          });
+        }
+
+        if (!doc) {
+          return res.status(404).json({
+            message: "Статья не найдена",
+          });
+        }
+
+        res.json({
+          success: true,
+        });
+      }
+    );
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Не удалось создать тест",
+    });
+  }
+};
