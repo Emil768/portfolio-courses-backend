@@ -44,6 +44,9 @@ app.post(
 //Проверка на авторизацию
 app.get("/auth/me", checkAuth, UserController.authMe);
 
+//Получение пользователя
+app.get("/auth/me/:id", UserController.authUser);
+
 //Загрузка аватарок
 app.post("/uploads", UserController.uploads);
 
@@ -64,6 +67,8 @@ app.patch(
   TestController.update
 );
 app.delete("/tests/:id", checkAuth, TestController.remove);
+
+app.get("/category/:name", TestController.getCategory);
 
 app.listen(3001, (err) => {
   if (err) {
