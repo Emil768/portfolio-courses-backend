@@ -42,6 +42,23 @@ const TestSchema = new mongoose.Schema(
       ],
     },
 
+    likes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+
+    comments: [
+      {
+        text: String,
+        postedBy: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+      },
+    ],
+
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

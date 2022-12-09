@@ -114,6 +114,52 @@ export const remove = async (req, res) => {
   }
 };
 
+export const createComment = async (req, res) => {
+  console.log(req.body);
+  try {
+    const { testId, text, userId } = req.body;
+
+    const comment = {
+      text,
+      postedBy: userId,
+    };
+
+    TestModel.findByIdAndUpdate(
+      {
+        _id: testId,
+      },
+      {
+        $push: {
+          comments: comment,
+        },
+      },
+      {
+        returnDocument: "after",
+      },
+      (err, doc) => {
+        if (err) {
+          return res.status(500).json({
+            message: "Не удалось вернуть статью",
+          });
+        }
+
+        if (!doc) {
+          return res.status(404).json({
+            message: "Статья не найдена",
+          });
+        }
+
+        res.json(doc);
+      }
+    ).populate("user");
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Не удалось создать комментарий",
+    });
+  }
+};
+
 export const getCategory = async (req, res) => {
   try {
     const category = req.params.name;
