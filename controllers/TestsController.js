@@ -43,7 +43,9 @@ export const getOne = async (req, res) => {
 
         res.json(doc);
       }
-    ).populate("user");
+    )
+      .populate("user")
+      .populate("comments.postedBy");
   } catch (err) {
     console.log(err);
     res.status(500).json({
@@ -115,13 +117,12 @@ export const remove = async (req, res) => {
 };
 
 export const createComment = async (req, res) => {
-  console.log(req.body);
   try {
-    const { testId, text, userId } = req.body;
+    const { testId, text } = req.body;
 
     const comment = {
       text,
-      postedBy: userId,
+      postedBy: req.userId,
     };
 
     TestModel.findByIdAndUpdate(
@@ -139,19 +140,21 @@ export const createComment = async (req, res) => {
       (err, doc) => {
         if (err) {
           return res.status(500).json({
-            message: "Не удалось вернуть статью",
+            message: "Не удалось вернуть комментарий",
           });
         }
 
         if (!doc) {
           return res.status(404).json({
-            message: "Статья не найдена",
+            message: "Комментарий не найден",
           });
         }
 
-        res.json(doc);
+        const { comments } = doc;
+        const newComment = comments.slice(-1);
+        res.json(...newComment);
       }
-    ).populate("user");
+    ).populate("comments.postedBy");
   } catch (err) {
     console.log(err);
     res.status(500).json({

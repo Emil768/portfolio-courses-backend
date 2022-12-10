@@ -67,7 +67,7 @@ app.patch(
   TestController.update
 );
 
-app.post("/comment", checkAuth, TestController.createComment);
+app.post("/comments", checkAuth, TestController.createComment);
 
 app.delete("/tests/:id", checkAuth, TestController.remove);
 
