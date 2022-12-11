@@ -1,6 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
+import bodyParser from "body-parser";
 import {
   loginValidation,
   registerValidation,
@@ -68,6 +69,7 @@ app.patch(
 );
 
 app.post("/comments", checkAuth, TestController.createComment);
+app.post("/comments/:id", checkAuth, TestController.removeComment);
 
 app.delete("/tests/:id", checkAuth, TestController.remove);
 

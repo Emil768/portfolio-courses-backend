@@ -107,12 +107,54 @@ export const update = async (req, res) => {
 
 export const remove = async (req, res) => {
   try {
-    const post = await TestModel.findByIdAndDelete(req.params.id);
-    if (!post) return res.json({ message: "Такого поста не существует" });
+    const testId = req.params.id;
 
-    res.json({ message: "Пост был удален." });
-  } catch (error) {
-    res.json({ message: "Что-то пошло не так." });
+    TestModel.findByIdAndDelete(
+      {
+        _id: testId,
+      },
+      (err, doc) => {
+        if (err) {
+          res.status(500).json({
+            message: "Не удалось удалить тест",
+          });
+        }
+
+        if (!doc) {
+          return res.status(500).json({
+            message: "Тест не найдена",
+          });
+        }
+        res.json(doc);
+      }
+    );
+  } catch (err) {
+    res.status(500).json({
+      message: "Не удалось удалить тест",
+    });
+  }
+};
+
+export const removeComment = async (req, res) => {
+  try {
+    const test = await TestModel.findById(req.body.testId);
+
+    const comment = test.comments.find(
+      (comment) => comment.id === req.params.id
+    );
+
+    if (!comment)
+      return res.status(404).json({ message: "Комментарий не найден" });
+
+    test.comments = test.comments.filter(({ id }) => id !== req.params.id);
+
+    await (await test.save()).populate("comments.postedBy");
+
+    res.json(test.comments);
+  } catch (err) {
+    res.status(500).json({
+      message: "Не удалось удалить комментарий",
+    });
   }
 };
 
