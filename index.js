@@ -70,6 +70,7 @@ app.patch(
 
 app.post("/comments", checkAuth, TestController.createComment);
 app.post("/comments/:id", checkAuth, TestController.removeComment);
+app.post("/comments/edit/:id", checkAuth, TestController.updateComment);
 
 app.delete("/tests/:id", checkAuth, TestController.remove);
 

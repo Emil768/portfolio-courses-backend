@@ -135,29 +135,6 @@ export const remove = async (req, res) => {
   }
 };
 
-export const removeComment = async (req, res) => {
-  try {
-    const test = await TestModel.findById(req.body.testId);
-
-    const comment = test.comments.find(
-      (comment) => comment.id === req.params.id
-    );
-
-    if (!comment)
-      return res.status(404).json({ message: "Комментарий не найден" });
-
-    test.comments = test.comments.filter(({ id }) => id !== req.params.id);
-
-    await (await test.save()).populate("comments.postedBy");
-
-    res.json(test.comments);
-  } catch (err) {
-    res.status(500).json({
-      message: "Не удалось удалить комментарий",
-    });
-  }
-};
-
 export const createComment = async (req, res) => {
   try {
     const { testId, text } = req.body;
@@ -201,6 +178,58 @@ export const createComment = async (req, res) => {
     console.log(err);
     res.status(500).json({
       message: "Не удалось создать комментарий",
+    });
+  }
+};
+
+export const updateComment = async (req, res) => {
+  try {
+    const test = await TestModel.findById(req.body.testId);
+
+    const comment = test.comments.find(
+      (comment) => comment.id === req.params.id
+    );
+
+    if (!comment)
+      return res.status(404).json({ message: "Комментарий не найден" });
+
+    test.comments = test.comments = test.comments.map((item) => {
+      if (item.id === req.params.id) {
+        item.text = req.body.text;
+      }
+      return item;
+    });
+
+    await (await test.save()).populate("comments.postedBy");
+
+    res.json(test.comments);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Не удалось обновить комментарий",
+    });
+  }
+};
+
+export const removeComment = async (req, res) => {
+  try {
+    const test = await TestModel.findById(req.body.testId);
+
+    const comment = test.comments.find(
+      (comment) => comment.id === req.params.id
+    );
+
+    if (!comment)
+      return res.status(404).json({ message: "Комментарий не найден" });
+
+    test.comments = test.comments.filter(({ id }) => id !== req.params.id);
+
+    await (await test.save()).populate("comments.postedBy");
+
+    res.json(test.comments);
+  } catch (err) {
+    res.status(500).json({
+      message: "Не удалось удалить комментарий",
     });
   }
 };

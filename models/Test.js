@@ -24,23 +24,25 @@ const TestSchema = new mongoose.Schema(
       required: true,
     },
 
-    ques: {
-      type: Array,
-      default: [
-        {
-          title: String,
-          answers: {
-            type: Array,
-            default: [
-              {
-                answer: String,
-                correct: Boolean,
-              },
-            ],
+    ques: [
+      {
+        title: String,
+        imageURL: {
+          public_id: {
+            type: String,
+          },
+          url: {
+            type: String,
           },
         },
-      ],
-    },
+        answers: [
+          {
+            answer: String,
+            correct: Boolean,
+          },
+        ],
+      },
+    ],
 
     likes: [
       {
@@ -57,6 +59,7 @@ const TestSchema = new mongoose.Schema(
           ref: "User",
           required: true,
         },
+        createdAt: { type: String, default: new Date() },
       },
     ],
 
