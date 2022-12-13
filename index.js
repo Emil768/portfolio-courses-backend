@@ -68,11 +68,18 @@ app.patch(
   TestController.update
 );
 
+app.patch("/like", checkAuth, TestController.likeTest);
+app.patch("/unlike", checkAuth, TestController.unlikeTest);
+
 app.post("/comments", checkAuth, TestController.createComment);
 app.post("/comments/:id", checkAuth, TestController.removeComment);
 app.post("/comments/edit/:id", checkAuth, TestController.updateComment);
 
 app.delete("/tests/:id", checkAuth, TestController.remove);
+
+app.get("/sort/date", TestController.sortByDate);
+app.get("/sort/likes", TestController.sortByLikes);
+app.get("/sort/views", TestController.sortByViews);
 
 app.get("/category/:name", TestController.getCategory);
 

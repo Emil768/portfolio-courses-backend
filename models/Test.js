@@ -46,8 +46,10 @@ const TestSchema = new mongoose.Schema(
 
     likes: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        likeBy: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
       },
     ],
 
@@ -57,7 +59,6 @@ const TestSchema = new mongoose.Schema(
         postedBy: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "User",
-          required: true,
         },
         createdAt: { type: String, default: new Date() },
       },

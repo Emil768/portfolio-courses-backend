@@ -2,7 +2,11 @@ import TestModel from "../models/Test.js";
 
 export const getAll = async (req, res) => {
   try {
-    const tests = await TestModel.find().populate("user").exec();
+    const tests = await TestModel.find()
+      .sort({ viewsCount: -1 })
+      .populate("user")
+      .populate("likes.likeBy")
+      .exec();
     res.json(tests);
   } catch (err) {
     console.log(err);
@@ -135,6 +139,91 @@ export const remove = async (req, res) => {
   }
 };
 
+export const likeTest = async (req, res) => {
+  try {
+    const { testId } = req.body;
+
+    TestModel.findByIdAndUpdate(
+      {
+        _id: testId,
+      },
+      {
+        $push: {
+          likes: { likeBy: req.userId },
+        },
+      },
+
+      {
+        returnDocument: "after",
+      },
+      (err, doc) => {
+        if (err) {
+          return res.status(500).json({
+            message: "Не удалось поставить нравится",
+          });
+        }
+
+        if (!doc) {
+          return res.status(404).json({
+            message: "Не удалось поставить нравится",
+          });
+        }
+
+        res.json(doc);
+      }
+    )
+      .populate("user")
+      .populate("likes.likeBy");
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Не удалось поставить нравится",
+    });
+  }
+};
+
+export const unlikeTest = async (req, res) => {
+  try {
+    const { testId } = req.body;
+
+    TestModel.findByIdAndUpdate(
+      {
+        _id: testId,
+      },
+      {
+        $pull: {
+          likes: { likeBy: req.userId },
+        },
+      },
+      {
+        returnDocument: "after",
+      },
+      (err, doc) => {
+        if (err) {
+          return res.status(500).json({
+            message: "Не удалось поставить не нравится",
+          });
+        }
+
+        if (!doc) {
+          return res.status(404).json({
+            message: "Не удалось поставить не нравится",
+          });
+        }
+
+        res.json(doc);
+      }
+    )
+      .populate("user")
+      .populate("likes.likeBy");
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Не удалось поставить не нравится",
+    });
+  }
+};
+
 export const createComment = async (req, res) => {
   try {
     const { testId, text } = req.body;
@@ -251,7 +340,54 @@ export const getCategory = async (req, res) => {
         });
       }
       res.json(doc);
-    }).populate("user");
+    })
+      .populate("user")
+      .populate("likes.likeBy");
+  } catch (err) {
+    res.status(500).json({
+      message: "Не удалось отобразить категорию",
+    });
+  }
+};
+
+export const sortByViews = async (req, res) => {
+  try {
+    const tests = await TestModel.find()
+      .sort({ viewsCount: -1 })
+      .populate("user")
+      .populate("likes.likeBy");
+
+    res.json(tests);
+  } catch (err) {
+    res.status(500).json({
+      message: "Не удалось отобразить категорию",
+    });
+  }
+};
+
+export const sortByDate = async (req, res) => {
+  try {
+    const tests = await TestModel.find()
+      .sort({ createdAt: -1 })
+      .populate("user")
+      .populate("likes.likeBy");
+
+    res.json(tests);
+  } catch (err) {
+    res.status(500).json({
+      message: "Не удалось отобразить категорию",
+    });
+  }
+};
+
+export const sortByLikes = async (req, res) => {
+  try {
+    const tests = await TestModel.find()
+      .sort({ likes: 1 })
+      .populate("user")
+      .populate("likes.likeBy");
+
+    res.json(tests);
   } catch (err) {
     res.status(500).json({
       message: "Не удалось отобразить категорию",
