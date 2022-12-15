@@ -58,6 +58,31 @@ export const getOne = async (req, res) => {
   }
 };
 
+export const getAllLikesUser = async (req, res) => {
+  try {
+    await TestModel.find()
+      .populate("user")
+      .populate("likes.likeBy")
+      .exec(function (err, tests) {
+        tests = tests.filter(({ likes }) =>
+          likes.find(({ likeBy }) => likeBy.id === req.params.id && likes)
+        );
+
+        if (err) {
+          res.status(500).json({
+            message: "Не удалось найти тест",
+          });
+        }
+
+        res.json(tests);
+      });
+  } catch (err) {
+    res.status(500).json({
+      message: "Не удалось получить тест",
+    });
+  }
+};
+
 export const create = async (req, res) => {
   try {
     const doc = new TestModel({

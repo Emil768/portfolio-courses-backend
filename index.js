@@ -69,6 +69,9 @@ app.patch(
 );
 
 app.patch("/like", checkAuth, TestController.likeTest);
+
+app.get("/getLikes/:id", TestController.getAllLikesUser);
+
 app.patch("/unlike", checkAuth, TestController.unlikeTest);
 
 app.post("/comments", checkAuth, TestController.createComment);
