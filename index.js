@@ -70,9 +70,11 @@ app.patch(
 
 app.patch("/like", checkAuth, TestController.likeTest);
 
-app.get("/getLikes/:id", TestController.getAllLikesUser);
+app.get("/getActionsUser/:id", TestController.getActionsUser);
 
 app.patch("/unlike", checkAuth, TestController.unlikeTest);
+
+app.post("/getScore/:id", checkAuth, TestController.getScoreUser);
 
 app.post("/comments", checkAuth, TestController.createComment);
 app.post("/comments/:id", checkAuth, TestController.removeComment);

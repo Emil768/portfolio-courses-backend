@@ -44,11 +44,26 @@ const TestSchema = new mongoose.Schema(
       },
     ],
 
+    score: [
+      {
+        scoreBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        totalScore: Number,
+        createdAt: {
+          type: Date,
+          default: new Date(),
+        },
+      },
+    ],
+
     likes: [
       {
-        likeBy: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
+        likeBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        createdAt: {
+          type: Date,
+          createdAt: {
+            type: Date,
+            default: new Date(),
+          },
         },
       },
     ],
@@ -56,11 +71,11 @@ const TestSchema = new mongoose.Schema(
     comments: [
       {
         text: String,
-        postedBy: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
+        postedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        createdAt: {
+          type: Date,
+          default: new Date(),
         },
-        createdAt: { type: String, default: new Date() },
       },
     ],
 

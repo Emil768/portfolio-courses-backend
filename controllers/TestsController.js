@@ -58,15 +58,48 @@ export const getOne = async (req, res) => {
   }
 };
 
-export const getAllLikesUser = async (req, res) => {
+export const getActionsUser = async (req, res) => {
   try {
     await TestModel.find()
       .populate("user")
-      .populate("likes.likeBy")
+      .lean()
       .exec(function (err, tests) {
-        tests = tests.filter(({ likes }) =>
-          likes.find(({ likeBy }) => likeBy.id === req.params.id && likes)
+        const allPublish = tests.filter(
+          ({ user }) => user._id.toString() === req.params.id
         );
+
+        const allComments = tests
+          .map((item) => {
+            return {
+              ...item,
+              comments: item.comments.filter(
+                ({ postedBy }) => postedBy.toString() === req.params.id
+              ),
+            };
+          })
+          .filter((elem) => elem.comments.length > 0);
+
+        const allLikes = tests
+          .map((item) => {
+            return {
+              ...item,
+              likes: item.likes.filter(
+                ({ likeBy }) => likeBy.toString() === req.params.id
+              ),
+            };
+          })
+          .filter((elem) => elem.likes.length > 0);
+
+        const allScore = tests
+          .map((item) => {
+            return {
+              ...item,
+              score: item.score.filter(
+                ({ scoreBy }) => scoreBy.toString() === req.params.id
+              ),
+            };
+          })
+          .filter((elem) => elem.score.length > 0);
 
         if (err) {
           res.status(500).json({
@@ -74,7 +107,7 @@ export const getAllLikesUser = async (req, res) => {
           });
         }
 
-        res.json(tests);
+        res.json({ allLikes, allComments, allPublish, allScore });
       });
   } catch (err) {
     res.status(500).json({
@@ -174,7 +207,7 @@ export const likeTest = async (req, res) => {
       },
       {
         $push: {
-          likes: { likeBy: req.userId },
+          likes: { likeBy: req.userId, createdAt: new Date() },
         },
       },
 
@@ -256,6 +289,7 @@ export const createComment = async (req, res) => {
     const comment = {
       text,
       postedBy: req.userId,
+      createdAt: new Date(),
     };
 
     TestModel.findByIdAndUpdate(
@@ -301,14 +335,14 @@ export const updateComment = async (req, res) => {
     const test = await TestModel.findById(req.body.testId);
 
     const comment = test.comments.find(
-      (comment) => comment.id === req.params.id
+      (comment) => comment.id.toString() === req.params.id
     );
 
     if (!comment)
       return res.status(404).json({ message: "Комментарий не найден" });
 
     test.comments = test.comments = test.comments.map((item) => {
-      if (item.id === req.params.id) {
+      if (item.id.toString() === req.params.id) {
         item.text = req.body.text;
       }
       return item;
@@ -330,18 +364,99 @@ export const removeComment = async (req, res) => {
     const test = await TestModel.findById(req.body.testId);
 
     const comment = test.comments.find(
-      (comment) => comment.id === req.params.id
+      (comment) => comment.id.toString() === req.params.id
     );
 
     if (!comment)
       return res.status(404).json({ message: "Комментарий не найден" });
 
-    test.comments = test.comments.filter(({ id }) => id !== req.params.id);
+    test.comments = test.comments.filter(
+      ({ id }) => id.toString() !== req.params.id
+    );
 
     await (await test.save()).populate("comments.postedBy");
 
     res.json(test.comments);
   } catch (err) {
+    res.status(500).json({
+      message: "Не удалось удалить комментарий",
+    });
+  }
+};
+
+// export const getScoreUser = async (req, res) => {
+//   try {
+//     const { totalScore } = req.body;
+
+//     const newTotal = {
+//       scoreBy: req.userId,
+//       createdAt: new Date(),
+//       totalScore,
+//     };
+
+//     db.your_collection.update(
+//       { "_id": ObjectId("your_24_byte_length_id") },
+//       { "$set": { "profile.experience.$[elem]": "new_value" } },
+//       { "arrayFilters": [ { "elem": { "$eq": "old_value" } } ], "multi": true }
+//   )
+
+//     TestModel.findByIdAndUpdate(
+//       {
+//         _id: req.params.id,
+//       },
+//       {
+//         $set: {
+//           score: newTotal,
+//         },
+//       },
+//       {
+//         returnDocument: "after",
+//       },
+//       (err, doc) => {
+//         if (err) {
+//           return res.status(500).json({
+//             message: "Не удалось вернуть комментарий",
+//           });
+//         }
+
+//         if (!doc) {
+//           return res.status(404).json({
+//             message: "Комментарий не найден",
+//           });
+//         }
+//         res.json(doc);
+//       }
+//     ).populate("score.scoreBy");
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).json({
+//       message: "Не удалось создать комментарий",
+//     });
+//   }
+// };
+
+export const getScoreUser = async (req, res) => {
+  try {
+    const { totalScore } = req.body;
+    const newTotal = {
+      scoreBy: req.userId,
+      createdAt: new Date(),
+      totalScore,
+    };
+
+    await TestModel.findByIdAndUpdate(
+      { _id: req.params.id },
+      { $pull: { score: { scoreBy: req.userId } } }
+    );
+
+    const tests = await TestModel.findById({ _id: req.params.id });
+    tests.score.push(newTotal);
+
+    await (await tests.save()).populate("score.scoreBy");
+
+    res.json(tests);
+  } catch (err) {
+    console.log(err);
     res.status(500).json({
       message: "Не удалось удалить комментарий",
     });
@@ -408,7 +523,7 @@ export const sortByDate = async (req, res) => {
 export const sortByLikes = async (req, res) => {
   try {
     const tests = await TestModel.find()
-      .sort({ likes: 1 })
+      .sort({ likes: -1 })
       .populate("user")
       .populate("likes.likeBy");
 
