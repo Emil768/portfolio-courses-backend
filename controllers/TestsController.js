@@ -384,56 +384,23 @@ export const removeComment = async (req, res) => {
   }
 };
 
-// export const getScoreUser = async (req, res) => {
-//   try {
-//     const { totalScore } = req.body;
+export const getTopScore = async (req, res) => {
+  try {
+    const test = await TestModel.findById({ _id: req.params.id }).populate(
+      "score.scoreBy"
+    );
+    const topScore = test.score.sort((a, b) =>
+      a.totalScore > b.totalScore ? -1 : 1
+    );
 
-//     const newTotal = {
-//       scoreBy: req.userId,
-//       createdAt: new Date(),
-//       totalScore,
-//     };
-
-//     db.your_collection.update(
-//       { "_id": ObjectId("your_24_byte_length_id") },
-//       { "$set": { "profile.experience.$[elem]": "new_value" } },
-//       { "arrayFilters": [ { "elem": { "$eq": "old_value" } } ], "multi": true }
-//   )
-
-//     TestModel.findByIdAndUpdate(
-//       {
-//         _id: req.params.id,
-//       },
-//       {
-//         $set: {
-//           score: newTotal,
-//         },
-//       },
-//       {
-//         returnDocument: "after",
-//       },
-//       (err, doc) => {
-//         if (err) {
-//           return res.status(500).json({
-//             message: "Не удалось вернуть комментарий",
-//           });
-//         }
-
-//         if (!doc) {
-//           return res.status(404).json({
-//             message: "Комментарий не найден",
-//           });
-//         }
-//         res.json(doc);
-//       }
-//     ).populate("score.scoreBy");
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).json({
-//       message: "Не удалось создать комментарий",
-//     });
-//   }
-// };
+    res.json(topScore);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Не удалось удалить комментарий",
+    });
+  }
+};
 
 export const getScoreUser = async (req, res) => {
   try {
@@ -466,8 +433,7 @@ export const getScoreUser = async (req, res) => {
 export const getCategory = async (req, res) => {
   try {
     const category = req.params.name;
-
-    TestModel.find({ category }, (err, doc) => {
+    TestModel.find({ "category.label": category }, (err, doc) => {
       if (err) {
         res.status(500).json({
           message: "Не удалось найти категорию",

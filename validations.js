@@ -15,7 +15,7 @@ export const loginValidation = [
 export const testCreateValidation = [
   body("title").isLength({ min: 3 }).isString(),
   body("text").isLength({ min: 5 }).isString(),
-  body("category").optional().isString(),
+  body("category").optional().isObject(),
   body("backgroundImage").isURL(),
   body("ques").isArray(),
 ];

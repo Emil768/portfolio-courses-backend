@@ -75,6 +75,7 @@ app.get("/getActionsUser/:id", TestController.getActionsUser);
 app.patch("/unlike", checkAuth, TestController.unlikeTest);
 
 app.post("/getScore/:id", checkAuth, TestController.getScoreUser);
+app.get("/getTopScore/:id", TestController.getTopScore);
 
 app.post("/comments", checkAuth, TestController.createComment);
 app.post("/comments/:id", checkAuth, TestController.removeComment);

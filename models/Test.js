@@ -11,8 +11,8 @@ const TestSchema = new mongoose.Schema(
       required: true,
     },
     category: {
-      type: String,
-      required: true,
+      value: String,
+      label: String,
     },
     viewsCount: {
       type: Number,
