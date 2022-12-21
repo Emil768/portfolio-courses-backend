@@ -1,10 +1,25 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import sharp from "sharp";
 
-import formidable from "formidable";
 import UserModel from "../models/User.js";
+import { cloudinary, bufferToStream } from "../utils/index.js";
 
-import { cloudinary } from "../utils/index.js";
+export const uploads = async (req, res) => {
+  try {
+    const data = await sharp(req.file.buffer).webp({ quality: 30 }).toBuffer();
+    const stream = cloudinary.uploader.upload_stream((result, error) => {
+      if (error) return console.error(error);
+      return res.json(result);
+    });
+
+    bufferToStream(data).pipe(stream);
+  } catch (err) {
+    res.status(500).json({
+      message: "Не удалось загрузить файл",
+    });
+  }
+};
 
 export const register = async (req, res) => {
   try {
@@ -120,20 +135,6 @@ export const authUser = async (req, res) => {
   } catch (err) {
     res.status(500).json({
       message: "Нет доступа",
-    });
-  }
-};
-
-export const uploads = (req, res) => {
-  try {
-    const form = formidable();
-    form.parse(req, async (err, field, file) => {
-      const response = await cloudinary.uploader.upload(file.image.filepath);
-      res.json(response);
-    });
-  } catch (err) {
-    res.status(500).json({
-      message: "Не удалось загрузить файл",
     });
   }
 };

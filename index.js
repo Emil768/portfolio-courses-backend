@@ -1,6 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
+import multer from "multer";
 import bodyParser from "body-parser";
 import {
   loginValidation,
@@ -26,6 +27,9 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
 //Авторизация
 app.post(
   "/auth/login",
@@ -49,7 +53,7 @@ app.get("/auth/me", checkAuth, UserController.authMe);
 app.get("/auth/me/:id", UserController.authUser);
 
 //Загрузка аватарок
-app.post("/uploads", UserController.uploads);
+app.post("/uploads", upload.single("picture"), UserController.uploads);
 
 //Роуты с тестами
 app.get("/tests", TestController.getAll);
