@@ -20,8 +20,12 @@ const TestSchema = new mongoose.Schema(
     },
 
     backgroundImage: {
-      type: String,
-      required: true,
+      public_id: {
+        type: String,
+      },
+      url: {
+        type: String,
+      },
     },
 
     ques: [

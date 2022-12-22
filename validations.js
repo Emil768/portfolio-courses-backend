@@ -16,6 +16,6 @@ export const testCreateValidation = [
   body("title").isLength({ min: 3 }).isString(),
   body("text").isLength({ min: 5 }).isString(),
   body("category").optional().isObject(),
-  body("backgroundImage").isURL(),
+  body("backgroundImage").isObject(),
   body("ques").isArray(),
 ];

@@ -1,4 +1,5 @@
 import TestModel from "../models/Test.js";
+import cloudinary from "../utils/cloudinary.js";
 
 export const getAll = async (req, res) => {
   try {
@@ -170,6 +171,11 @@ export const update = async (req, res) => {
 export const remove = async (req, res) => {
   try {
     const testId = req.params.id;
+
+    const test = await TestModel.findById(testId);
+    const testImg = test.backgroundImage.public_id;
+
+    await cloudinary.uploader.destroy(testImg);
 
     TestModel.findByIdAndDelete(
       {

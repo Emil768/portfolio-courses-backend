@@ -7,7 +7,9 @@ import { cloudinary, bufferToStream } from "../utils/index.js";
 
 export const uploads = async (req, res) => {
   try {
-    const data = await sharp(req.file.buffer).webp({ quality: 30 }).toBuffer();
+    const data = await sharp(req.file.buffer, { animated: true })
+      .webp({ quality: 30 })
+      .toBuffer();
     const stream = cloudinary.uploader.upload_stream((result, error) => {
       if (error) return console.error(error);
       return res.json(result);
