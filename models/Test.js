@@ -45,6 +45,7 @@ const TestSchema = new mongoose.Schema(
             correct: Boolean,
           },
         ],
+        typeQuestion: String,
       },
     ],
 

@@ -439,7 +439,7 @@ export const getScoreUser = async (req, res) => {
 export const getCategory = async (req, res) => {
   try {
     const category = req.params.name;
-    TestModel.find({ "category.label": category }, (err, doc) => {
+    TestModel.find({ "category.value": category }, (err, doc) => {
       if (err) {
         res.status(500).json({
           message: "Не удалось найти категорию",
