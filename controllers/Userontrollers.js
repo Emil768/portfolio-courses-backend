@@ -7,6 +7,7 @@ import { cloudinary, bufferToStream } from "../utils/index.js";
 
 export const uploads = async (req, res) => {
   try {
+    console.log(req.file);
     const data = await sharp(req.file.buffer, { animated: true })
       .webp({ quality: 30 })
       .toBuffer();
@@ -97,6 +98,7 @@ export const login = async (req, res) => {
       token,
     });
   } catch (err) {
+    console.log(req.body);
     res.status(500).json({
       message: "Не удалось авторизоваться",
     });
@@ -106,25 +108,6 @@ export const login = async (req, res) => {
 export const authMe = async (req, res) => {
   try {
     const user = await UserModel.findById(req.userId);
-    if (!user) {
-      return res.status(404).json({
-        message: "Пользователь не найден",
-      });
-    }
-
-    const { passwordHash, ...userData } = user._doc;
-
-    res.json(userData);
-  } catch (err) {
-    res.status(500).json({
-      message: "Нет доступа",
-    });
-  }
-};
-
-export const authUser = async (req, res) => {
-  try {
-    const user = await UserModel.findById(req.params.id);
     if (!user) {
       return res.status(404).json({
         message: "Пользователь не найден",

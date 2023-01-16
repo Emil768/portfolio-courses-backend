@@ -49,9 +49,6 @@ app.post(
 //Проверка на авторизацию
 app.get("/auth/me", checkAuth, UserController.authMe);
 
-//Получение пользователя
-app.get("/auth/me/:id", UserController.authUser);
-
 //Загрузка аватарок
 app.post("/uploads", upload.single("picture"), UserController.uploads);
 

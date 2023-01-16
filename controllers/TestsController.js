@@ -1,4 +1,5 @@
 import TestModel from "../models/Test.js";
+import UserModel from "../models/User.js";
 import cloudinary from "../utils/cloudinary.js";
 
 export const getAll = async (req, res) => {
@@ -61,6 +62,15 @@ export const getOne = async (req, res) => {
 
 export const getActionsUser = async (req, res) => {
   try {
+    const user = await UserModel.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({
+        message: "Пользователь не найден",
+      });
+    }
+
+    const { passwordHash, ...userData } = user._doc;
+
     await TestModel.find()
       .populate("user")
       .lean()
@@ -104,15 +114,21 @@ export const getActionsUser = async (req, res) => {
 
         if (err) {
           res.status(500).json({
-            message: "Не удалось найти тест",
+            message: "Не удалось найти прогресс",
           });
         }
 
-        res.json({ allLikes, allComments, allPublish, allScore });
+        res.json({
+          user: userData,
+          allLikes,
+          allComments,
+          allPublish,
+          allScore,
+        });
       });
   } catch (err) {
     res.status(500).json({
-      message: "Не удалось получить тест",
+      message: "Не удалось получить прогресс",
     });
   }
 };
@@ -290,9 +306,10 @@ export const unlikeTest = async (req, res) => {
 
 export const createComment = async (req, res) => {
   try {
-    const { testId, text } = req.body;
+    const { comment } = req.body;
+    const { text, testId } = comment;
 
-    const comment = {
+    const newComment = {
       text,
       postedBy: req.userId,
       createdAt: new Date(),
@@ -304,7 +321,7 @@ export const createComment = async (req, res) => {
       },
       {
         $push: {
-          comments: comment,
+          comments: newComment,
         },
       },
       {
@@ -347,9 +364,10 @@ export const updateComment = async (req, res) => {
     if (!comment)
       return res.status(404).json({ message: "Комментарий не найден" });
 
-    test.comments = test.comments = test.comments.map((item) => {
+    test.comments = test.comments.map((item) => {
       if (item.id.toString() === req.params.id) {
         item.text = req.body.text;
+        item.createdAt = new Date();
       }
       return item;
     });
@@ -431,7 +449,7 @@ export const getScoreUser = async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).json({
-      message: "Не удалось удалить комментарий",
+      message: "Не удалось обработать результат",
     });
   }
 };
