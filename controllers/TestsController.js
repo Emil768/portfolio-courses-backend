@@ -516,7 +516,6 @@ export const sortByLikes = async (req, res) => {
       .sort({ likes: -1 })
       .populate("user")
       .populate("likes.likeBy");
-
     res.json(tests);
   } catch (err) {
     res.status(500).json({
