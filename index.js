@@ -90,7 +90,7 @@ app.get("/sort/views", TestController.sortByViews);
 
 app.get("/category/:name", TestController.getCategory);
 
-app.listen(3001, (err) => {
+app.listen(process.env.PORT || 4444, (err) => {
   if (err) {
     return console.log(err);
   }
