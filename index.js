@@ -14,9 +14,7 @@ import { UserController, TestController } from "./controllers/index.js";
 import { checkAuth, handlerValidationError } from "./utils/index.js";
 
 mongoose
-  .connect(
-    "mongodb+srv://admin:wwwwww@cluster0.n7ggb6x.mongodb.net/tests?retryWrites=true&w=majority"
-  )
+  .connect(process.env.DATABASE_URL)
   .then(() => {
     console.log("DB OK!");
   })
