@@ -189,9 +189,6 @@ export const remove = async (req, res) => {
     const testId = req.params.id;
 
     const test = await TestModel.findById(testId);
-    const testImg = test.backgroundImage.public_id;
-
-    await cloudinary.uploader.destroy(testImg);
 
     TestModel.findByIdAndDelete(
       {
