@@ -37,6 +37,7 @@ export const register = async (req, res) => {
         url: req.body.avatarUrl.url,
       },
       passwordHash: hash,
+      role: "user",
     });
 
     const user = await doc.save();

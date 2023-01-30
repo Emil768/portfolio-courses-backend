@@ -1,6 +1,5 @@
 import TestModel from "../models/Test.js";
 import UserModel from "../models/User.js";
-import cloudinary from "../utils/cloudinary.js";
 
 export const getAll = async (req, res) => {
   try {
